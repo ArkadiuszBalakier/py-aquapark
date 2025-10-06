@@ -7,29 +7,29 @@ class IntegerRange:
         self.min_amount = min_amount
         self.max_amount = max_amount
 
-    def __set_name__(self, owner, age):
+    def __set_name__(self, owner, age) -> None:
         self._age = age
 
-    def __set__(self, instance, value):
+    def __set__(self, instance, value) -> None:
         if not hasattr(instance, '_private_data'):
             instance._private_data = {}
 
         if not isinstance(value, int):
-            raise TypeError('Value {value} must be an integer')
+            raise TypeError(f'Value {value} must be an integer')
 
         if self.min_amount <= value <= self.max_amount:
             instance._private_data[self._age]= value
         else:
             raise ValueError(f"Value {value} must be between {self.min_amount} and {self.max_amount}")
 
-    def __get__(self, instance, owner):
+    def __get__(self, instance, owner) -> object:
         if instance is None:
             return self
         return instance._private_data[self._age]
 
 
 class Visitor:
-   def __init__(self, name: str, age: int, weight: int, height: int) -> None:
+    def __init__(self, name: str, age: int, weight: int, height: int) -> None:
         self.name = name
         self.age = age
         self.weight = weight
@@ -44,7 +44,7 @@ class SlideLimitationValidator(ABC):
 
 
 class ChildrenSlideLimitationValidator(SlideLimitationValidator):
-    age = IntegerRange(4,4)
+    age = IntegerRange(4,14)
     weight = IntegerRange(20, 50)
     height = IntegerRange(80, 120)
 
@@ -70,12 +70,12 @@ class Slide:
         self.name = name
         self.limitation_class = limitation_class
 
-    def can_access(self, visitor: dict) -> bool:
+    def can_access(self, visitor: Visitor) -> bool:
         try:
             self.limitation_class(
-                age = visitor['age'],
-                weight = visitor['weight'],
-                height = visitor['height']
+                age = visitor.age,
+                weight = visitor.weight,
+                height = visitor.height
             )
             return True
         except (ValueError, TypeError) as e:
